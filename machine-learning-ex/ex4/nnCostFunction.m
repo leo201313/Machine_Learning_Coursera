@@ -61,7 +61,61 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
+one1 = ones(m,1);
+X = [one1,X];
+z_2 = X*Theta1'; %5000 * 25
+hidden = sigmoid(z_2);
+one2 = ones(size(hidden,1),1);
+hidden = [one2,hidden]; % hidden is 5000 * 26
+z_3 = hidden * Theta2';
+out = sigmoid(z_3); % out is 5000 * 10
+SUM = 0;
+Y = zeros(m,num_labels);
+for j = 1 : m
+    Y(j,y(j)) = 1;
+end
+% Y is 5000 * 10
+for i = 1 : m
+    tep = Y(i,:)*log(out(i,:)') + (1-Y(i,:))*log(1-out(i,:)');
+    SUM = SUM + tep;
+end
 
+J = -SUM/m;
+
+%=================================================
+
+reg = lambda/2/m*(sum(Theta1(:,2:end).^2,'all') + sum(Theta2(:,2:end).^2,'all'));
+J = J +reg;
+
+%=================================================
+DELTA_1 = 0;
+DELTA_2 = 0;
+for i = 1 : m
+    delta_3 = out(i,:) - Y(i,:); % 1 * 10
+    delta_2 = delta_3*Theta2(:,2:end).*sigmoidGradient(z_2(i,:)); % 1*25
+    DELTA_2 = DELTA_2 + delta_3' * hidden(i,:);  % 10 * 26
+    DELTA_1 = DELTA_1 + delta_2' * X(i,:); % 25 * 401
+end
+
+Theta1_grad = DELTA_1 ./ m;
+Theta2_grad = DELTA_2 ./ m;
+
+Theta1_grad = reshape(Theta1_grad,[],1);
+Theta2_grad = reshape(Theta2_grad,[],1);
+
+grad = [Theta1_grad;Theta2_grad];
+
+%================================================================
+Theta1_grad = DELTA_1 ./ m;
+Theta2_grad = DELTA_2 ./ m;
+
+Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + Theta1(:,2:end).*lambda./m;
+Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + Theta2(:,2:end).*lambda./m;
+
+Theta1_grad = reshape(Theta1_grad,[],1);
+Theta2_grad = reshape(Theta2_grad,[],1);
+
+grad = [Theta1_grad;Theta2_grad];
 
 
 

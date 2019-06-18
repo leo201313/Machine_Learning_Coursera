@@ -10,6 +10,7 @@ function p = predictOneVsAll(all_theta, X)
 
 m = size(X, 1);
 num_labels = size(all_theta, 1);
+none = [];
 
 % You need to return the following variables correctly 
 p = zeros(size(X, 1), 1);
@@ -30,6 +31,7 @@ X = [ones(m, 1) X];
 %       for each row.
 %       
 
+[none,p] = max(sigmoid(X*all_theta'),[],2);
 
 
 
